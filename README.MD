@@ -95,6 +95,6 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 ## 启动运行
 支持start/stop/restart
 - 开发环境：go run main start/stop/restart
-- 生成环境：xxx start/stop/restart
+- 生产环境：xxx start/stop/restart &
 
 
