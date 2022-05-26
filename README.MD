@@ -1,9 +1,5 @@
-## 启动运行
-支持start/stop/restart
-- 开发环境：go run main start/stop/restart
-- 生成环境：xxx start/stop/restart
-
 ## 包含功能模块
+- mvc
 - http微框架：gin github.com/gin-gonic/gin
 - orm：gorm.io/gorm （表名不为复数，SingularTable）
 - 日志：zap lumberjack
@@ -21,7 +17,7 @@
 - 默认读取./config/config.yaml secret.yaml system.yaml3个文件
 - 使用方法：core.GetConfigString("app.name") core.GetConfigInt("app.port")
 ### 日志
-保存目录、文件名、分隔大小见配置文件logger项，包含：
+保存目录、文件名、分割大小见配置文件logger项，包含：
 - error,info,debug日志
 - db日志 
 - 启动日志
@@ -95,4 +91,10 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 - 添加控制器映射：./mygin/router.go->InitCtrlByName方法中增加
     case "user":
 		v = reflect.ValueOf(new(controller.UserController))
+		
+## 启动运行
+支持start/stop/restart
+- 开发环境：go run main start/stop/restart
+- 生成环境：xxx start/stop/restart
+
 
