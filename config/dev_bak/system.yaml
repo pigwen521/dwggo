@@ -1,0 +1,3 @@
+router:
+  default_controller: Home
+  default_action: Index

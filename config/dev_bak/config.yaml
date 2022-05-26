@@ -1,0 +1,23 @@
+env: debug      #gin mode:debug test release
+logger:         #user log
+  level: debug  #debug,info,warn,error,dpanic,panic,fatal
+  custom_dir: "./logs/"  #自定义日志文件目录
+  custom_suffix: "log"  #自定义日志文件后缀
+  error_path: "./logs/error.log" #error warning
+  info_path: "./logs/info.log" #info debug
+  gin_path: "./logs/gin.txt" 
+  db_path: "./logs/db.log"
+  max_size: 50  #MB，单个日志文件大小
+  max_backups: 90 #保留旧文件的最大个数
+  max_age: 60 #保留旧文件的最大天数
+
+app:
+  name: 袋鼠体检预约集成平台
+  domain: http://localhost
+  port: 8080
+  path: / #站点URL的根目录可带子目录访问,/结尾
+  version: v0.3
+
+limiter:  #限流器
+  rate_second: 4 #每秒生成多个可用令牌，单机qps，不开启设置0
+  capacity: 2     #令牌桶容量，一般rate_seccond的一半
