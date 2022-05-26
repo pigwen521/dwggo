@@ -91,6 +91,7 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 - 添加控制器映射：./mygin/router.go->InitCtrlByName方法中增加
     case "user":
 		v = reflect.ValueOf(new(controller.UserController))
+- 开始编码：UserController.go -> login()
 		
 ## 启动运行
 支持start/stop/restart
