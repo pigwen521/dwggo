@@ -57,7 +57,6 @@ func setConnPool() {
 	sqlDb.SetConnMaxIdleTime(time.Second * GetConfigDuration("database.pool_idle_time"))
 	sqlDb.SetConnMaxLifetime(time.Second * GetConfigDuration("database.pool_life_time")) //必须同时设置Lifetime，IdleTime才生效
 	LogInfo("init db conn pool")
-
 }
 
 //日志参数
