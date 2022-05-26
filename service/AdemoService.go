@@ -1,10 +1,10 @@
 package service
 
 import (
-	"dsjk.com/openplatform/core"
-	"dsjk.com/openplatform/entity"
-	"dsjk.com/openplatform/lib/helper/str"
-	"dsjk.com/openplatform/model"
+	"dsjk.com/dwggo/core"
+	"dsjk.com/dwggo/entity"
+	"dsjk.com/dwggo/lib/helper/str"
+	"dsjk.com/dwggo/model"
 	"gorm.io/gorm"
 )
 

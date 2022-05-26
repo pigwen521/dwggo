@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"dsjk.com/openplatform/consts"
+	"dsjk.com/dwggo/consts"
 	"github.com/gin-gonic/gin"
 )
 

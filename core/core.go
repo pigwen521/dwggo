@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"dsjk.com/openplatform/consts"
-	"dsjk.com/openplatform/lib/helper/str"
+	"dsjk.com/dwggo/consts"
+	"dsjk.com/dwggo/lib/helper/str"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )

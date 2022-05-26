@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"dsjk.com/openplatform/mygin"
+	"dsjk.com/dwggo/mygin"
 )
 
 func main() {

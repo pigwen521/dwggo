@@ -12,10 +12,10 @@ import (
 	"syscall"
 	"time"
 
-	"dsjk.com/openplatform/core"
-	"dsjk.com/openplatform/lib/helper"
-	"dsjk.com/openplatform/lib/helper/str"
-	"dsjk.com/openplatform/lib/helper/str/verify"
+	"dsjk.com/dwggo/core"
+	"dsjk.com/dwggo/lib/helper"
+	"dsjk.com/dwggo/lib/helper/str"
+	"dsjk.com/dwggo/lib/helper/str/verify"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
 )

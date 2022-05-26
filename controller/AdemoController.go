@@ -3,9 +3,9 @@ package controller
 import (
 	"net/http"
 
-	"dsjk.com/openplatform/core"
-	"dsjk.com/openplatform/model"
-	"dsjk.com/openplatform/service"
+	"dsjk.com/dwggo/core"
+	"dsjk.com/dwggo/model"
+	"dsjk.com/dwggo/service"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )

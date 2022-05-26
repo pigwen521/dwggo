@@ -1,4 +1,4 @@
-module dsjk.com/openplatform
+module dsjk.com/dwggo
 
 go 1.15
 

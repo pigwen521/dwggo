@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"dsjk.com/openplatform/consts"
+	"dsjk.com/dwggo/consts"
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"strings"
 
-	"dsjk.com/openplatform/controller"
-	"dsjk.com/openplatform/core"
-	"dsjk.com/openplatform/lib/helper/str"
+	"dsjk.com/dwggo/controller"
+	"dsjk.com/dwggo/core"
+	"dsjk.com/dwggo/lib/helper/str"
 
 	"github.com/gin-gonic/gin"
 )
