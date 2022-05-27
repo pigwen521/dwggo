@@ -12,6 +12,7 @@ var Redis_pool *redis.Pool
 /**
 1,
 myredis := MyRedis{}
+defer myredis.Close()
 myredis.Set(key, val, ttl)
 val,err:=myredis.Get(key)
 if myredis.IsError(err) {
@@ -19,10 +20,12 @@ if myredis.IsError(err) {
 }
 2,
 myredis := MyRedis{}
+defer myredis.Close()
 conn := myredis.GetConn()
 conn.Do("Set", "abc", 100, "EX", 100)
 3,
 conn := core.Redis_pool.Get()
+defer conn.Close()
 _, err := conn.Do("Set", "abc", 100, "EX", 100)
 
 res, err := redis.Int(conn.Do("Get", "abc"))
@@ -75,4 +78,8 @@ func (self *MyRedis) Del(key string) (interface{}, error) {
 //判断Get后的是否有error，要排查为空的数据
 func (self *MyRedis) IsError(err error) bool {
 	return err != nil && !errors.Is(err, redis.ErrNil)
+}
+
+func (self *MyRedis) Close() {
+	self.Conn.Close()
 }
