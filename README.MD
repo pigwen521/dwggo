@@ -49,6 +49,7 @@ orm.Where("name=?", name).Find(&obj)
 - 封装后的写法（仅get set del，请求方法不全，可以自行完善）
 ```go
 myredis := MyRedis{}
+defer myredis.Close()
 myredis.Set(key, val, ttl)
 val,err:=myredis.Get(key)
 if myredis.IsError(err) {
@@ -58,12 +59,14 @@ if myredis.IsError(err) {
 - 封装conn写法-原生请求
 ```go
 myredis := MyRedis{}
+defer myredis.Close()
 conn := myredis.GetConn()
 conn.Do("Set", "abc", 100, "EX", 100)
 ```
 - 原生写法
 ```go
 conn := core.Redis_pool.Get()
+defer conn.Close()
 _, err := conn.Do("Set", "abc", 100, "EX", 100)
 
 res, err := redis.Int(conn.Do("Get", "abc"))
