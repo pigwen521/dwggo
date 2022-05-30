@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"dsjk.com/dwggo/consts"
 	"dsjk.com/dwggo/core"
@@ -24,30 +26,31 @@ const (
 )
 
 //API请求-回写请求和响应日志
-func Api(url_str string, method string, params ...*map[string]interface{}) (*string, error) {
+func Api(url_str string, method string, params ...map[string]interface{}) (*string, error) {
 	return ApiALLParams(url_str, method, true, true, params...)
 }
 
 //API请求-不写请求和响应日志
-func ApiNoAllLog(url_str string, method string, params ...*map[string]interface{}) (*string, error) {
+func ApiNoAllLog(url_str string, method string, params ...map[string]interface{}) (*string, error) {
 	return ApiALLParams(url_str, method, false, false, params...)
 }
 
 //API请求-写请求日志，不写响应日志
-func ApiNoResponsLog(url_str string, method string, params ...*map[string]interface{}) (*string, error) {
+func ApiNoResponsLog(url_str string, method string, params ...map[string]interface{}) (*string, error) {
 	return ApiALLParams(url_str, method, true, false, params...)
 }
-func ApiALLParams(url_str string, method string, WriteRequestLog, WriteResponsLog bool, params ...*map[string]interface{}) (*string, error) {
+func ApiALLParams(url_str string, method string, WriteRequestLog, WriteResponsLog bool, params ...map[string]interface{}) (*string, error) {
 	var body *string
 	var err error
+	time_start := time.Now()
 	defer func() {
-		writeReqResRecord(body, err, url_str, method, WriteRequestLog, WriteResponsLog, params...) //匿名函数才能获取到真正的body，否则是nil
+		writeReqResRecord(body, err, url_str, method, WriteRequestLog, WriteResponsLog, time_start, params...) //匿名函数才能获取到真正的body，否则是nil
 	}()
 	body, err = RESTFul(url_str, method, params...)
 
 	return body, err
 }
-func writeReqResRecord(body *string, err error, url_str string, method string, WriteRequestLog, WriteResponsLog bool, params ...*map[string]interface{}) { //记录请求，返回日志
+func writeReqResRecord(body *string, err error, url_str string, method string, WriteRequestLog, WriteResponsLog bool, time_start time.Time, params ...map[string]interface{}) { //记录请求，返回日志
 	if WriteRequestLog {
 		json, _ := json.Marshal(params)
 		var res string
@@ -64,11 +67,12 @@ func writeReqResRecord(body *string, err error, url_str string, method string, W
 		} else {
 			err_str = ",error:"
 		}
-		core.LogInfoCustom("url_str:"+url_str+"	"+method+"	params:"+string(json)+"	respons:"+res+err_str, consts.LOGFILE_MYAPI)
+		time_offset := fmt.Sprintf("%.3f", (float64(time.Since(time_start)) / float64(time.Second)))
+		core.LogInfoCustom("url_str:"+url_str+"	"+method+"	times:"+time_offset+"s	params:"+string(json)+"	respons:"+res+err_str, consts.LOGFILE_MYAPI)
 	}
 }
 
-func RESTFul(url_str string, method string, params ...*map[string]interface{}) (*string, error) {
+func RESTFul(url_str string, method string, params ...map[string]interface{}) (*string, error) {
 	switch strings.ToUpper(method) {
 	case MYAPI_METHOD_GET:
 		return Get(url_str, params...)
@@ -90,7 +94,7 @@ options {
 	"timeout/content_type/ret_is_json" //TODO
 }
 */
-func Get(url_str string, params ...*map[string]interface{}) (*string, error) {
+func Get(url_str string, params ...map[string]interface{}) (*string, error) {
 	var err error
 	if len(params) > 0 {
 		url_str, err = AppendQueryToUrl(url_str, params[0])
@@ -113,7 +117,7 @@ options {
 	"timeout/content_type/ret_is_json" //TODO
 }
 */
-func PostForm(url_str string, params ...*map[string]interface{}) (*string, error) {
+func PostForm(url_str string, params ...map[string]interface{}) (*string, error) {
 	var err error
 	if len(params) == 0 {
 		return nil, errors.New("post param is request")
@@ -121,7 +125,7 @@ func PostForm(url_str string, params ...*map[string]interface{}) (*string, error
 	//options := params[1] TODO
 
 	urlValues := url.Values{}
-	for k, v := range *params[0] {
+	for k, v := range params[0] {
 		urlValues.Add(k, str.ToString(v))
 	}
 	resp, err := http.PostForm(url_str, urlValues)
@@ -137,7 +141,7 @@ options {
 	"timeout/content_type/ret_is_json" //TODO
 }
 */
-func PostJson(url_str string, params ...*map[string]interface{}) (*string, error) {
+func PostJson(url_str string, params ...map[string]interface{}) (*string, error) {
 	var err error
 	if len(params) == 0 {
 		return nil, errors.New("post param is request")
@@ -177,14 +181,14 @@ func doResp(err error, url_str string, resp *http.Response) (*string, error) {
 /**
 拼接get参数到url上
 */
-func AppendQueryToUrl(url_str string, querys *map[string]interface{}) (string, error) {
+func AppendQueryToUrl(url_str string, querys map[string]interface{}) (string, error) {
 	params := url.Values{}
 	url_ret, err := url.Parse(url_str)
 	if err != nil {
 		core.LogError("AppendQueryToUrl parse url error:" + url_str + "," + err.Error())
 		return "", err
 	}
-	for k, v := range *querys {
+	for k, v := range querys {
 		params.Set(k, str.ToString(v))
 	}
 	if url_ret.RawQuery != "" {
