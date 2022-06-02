@@ -22,12 +22,12 @@
 - db日志 
 - 启动日志
 - 请求API日志
-使用方法
+#### 使用方法
 - core.LogError("log...")
 - core.LogInfo("log...")
 - core.LogDebug("log...")
 - core.LogErrorAndPanic("log...")
-自定义日志文件
+#### 自定义日志文件
 - core.LogErrorCustom("log...",FILE_NAME)
 - core.LogInfoCustom("log...",FILE_NAME)
 ### 限流器
@@ -98,7 +98,7 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 		
 ## 启动运行
 支持start/stop/restart
-- 开发环境：go run main start/stop/restart
+- 开发环境：go run main.go start/stop/restart
 - 生产环境：xxx start/stop/restart &
 
 
