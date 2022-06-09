@@ -1,0 +1,26 @@
+env: release      #环境：gin mode:debug test release
+logger:         #user log
+  level: info  #系统日志级别：debug,info,warn,error,dpanic,panic,fatal
+  custom_dir: "/data/logs/"  #自定义日志文件目录
+  custom_suffix: "log"  #自定义日志文件后缀
+  error_path: "/data/logs/error.log" #error warning
+  info_path: "/data/logs/info.log" #info debug
+  gin_path: "/data/logs/gin.txt"   
+  db_path: "/data/logs/db.log"
+  apilog_filename: "myapi"  #API请求的日志文件
+  db_slow_threshold: 2.5 #慢日志-秒
+  db_level: warn #数据库日志级别 info,warn。设置info，记录全部数据库请求日志；设置warn，只记录错误，慢日志，告警。
+  max_size: 50  #MB，单个日志文件大小
+  max_backups: 90 #保留旧文件的最大个数
+  max_age: 60 #保留旧文件的最大天数
+
+app:
+  name: 项目名称
+  domain: http://localhost
+  port: 8080
+  path: / #站点URL的根目录可带子目录访问,/结尾，如http://127.0.0.1/myproject/ 就配置：myproject/
+  version: v0.1
+
+limiter:  #限流器
+  rate_second: 100 #每秒生成多个可用令牌，单机qps，不开启设置0
+  capacity: 50     #令牌桶容量，一般rate_seccond的一半

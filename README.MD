@@ -1,5 +1,6 @@
 ## 包含功能模块
 - mvc
+- 支持多应用
 - http微框架：gin github.com/gin-gonic/gin
 - orm：gorm.io/gorm （表名不为复数，SingularTable）
 - 日志：zap lumberjack
@@ -8,7 +9,7 @@
 
 ## 功能介绍
 ### MVC
-请求./ademo/query?name=test，对应业务代码如下：
+请求./ademo/query?name=test，对应业务代码，在./apps/APP_NAME/下：
 - 控制器 ./controller/AdemoController.go
 - 数据输入输出模型 ./model/AdemoModel.go
 - 业务逻辑 ./service/AdemoService.go
@@ -37,6 +38,7 @@
 - GET：myapi.Api(url,myapi.MYAPI_METHOD_GET,map_data)
 - POST-json：myapi.Api(url,myapi.MYAPI_METHOD_JSON,map_data)
 - POST-form：myapi.Api(url,myapi.MYAPI_METHOD_POST_FORM,map_data)
+- POST-text：myapi.Api(url,myapi.MYAPI_METHOD_POST_TEXT,map_data)
 - 不记录请求和响应日志：myapi.ApiNoAllLog
 - 不记录响应日志：myapi.ApiNoResponsLog
 ### Mysql
@@ -76,7 +78,7 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 - 控制器中的CallBefore为钩子方法，在运行acton之前运行，return false可阻断运行
 - 接口返回推荐：core.ResultFail(ctx,msg),core.ResultSucc(ctx,data)
 - 项目常量位置：consts/user_consts.go
-- 用户库位置：lib/userlib/
+- 用户库位置：lib/
 - 判断运行环境：core.IsEnvDev() core.IsEnvTest() core.IsEnvPro()
 - 数组方法：lib/helper/arrmap/arr.go InArrayStr() InArrayInt() IsArray()...
 - map方法：lib/helper/arrmap/map.go InMapStrKey() InMapStrVal() MergeMap()...
@@ -84,20 +86,19 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 - 正则验证：lib/helper/str/verify/verify.go IsDate() IsTime() IsNumber()...
 
 ## 开始编码
-比如： ./user/login
-代码初始化
-- 复制 ./controller/AdemoController.go =》UserController.go 
-- 复制 ./model/AdemoModel.go =》UserModel.go
-- 复制 ./service/AdemoService.go =》 UserService.go
-- 复制 ./entity/Ademo.go =》 User.go
-- 修改上述文件中的type名称，如type AdemoController struct等
+业务代码都在apps;比如： ./user/login
+- 获取代码后修改mod name，替换代码中的：dsjk.com/dwggo
+- 新应用刚开始，复制apps/ademo => apps/YOUR_PROJECT_NAME，以后在该目录下编码
+- 复制 ./controller ./entity ./model ./service下的 AdemoXXXX.go =》 UserXXXX.go
+- 修改上述文件中的type名称，如AdemoXXXX => AdemoUser
 - 添加控制器映射：./mygin/router.go->InitCtrlByName方法中增加
     case "user":
-		v = reflect.ValueOf(new(controller.UserController))
+		v = reflect.ValueOf(new(UserController))
 - 开始编码：UserController.go -> login()
-		
+
 ## 启动运行
-支持start/stop/restart
+在apps/YOUR_PROJECT_NAME/目录下
+- 支持start/stop/restart
 - 开发环境：go run main.go start/stop/restart
 - 生产环境：xxx start/stop/restart &
 
