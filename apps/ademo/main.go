@@ -6,7 +6,9 @@ import (
 	"strings"
 
 	"dsjk.com/dwggo/apps/ademo/controller"
+	"dsjk.com/dwggo/system/core"
 	"dsjk.com/dwggo/system/mygin"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -28,19 +30,32 @@ func cmd() {
 		os_args[0] = os_args[1] //暂时只支持一个参数，兼容：go run main.go start 两个参数
 	}
 
+	gin := initGin()
 	switch strings.ToLower(os_args[0]) {
 	case "start":
 		log.Println("start ing...")
-		mygin.Start(controller.InitCtrlByName)
+		mygin.Start(gin, controller.InitCtrlByName)
 	case "stop":
 		log.Println("stop ing...")
 		mygin.Stop()
 	case "restart":
 		log.Println("restart ing...")
 		mygin.Stop()
-		mygin.Start(controller.InitCtrlByName)
+		mygin.Start(gin, controller.InitCtrlByName)
 
 	default:
 		log.Println("cmd arg is wrong,such as: xxx start/stop/restart")
 	}
+}
+
+func initGin() *gin.Engine {
+	gin.SetMode(core.GetConfigString("env"))
+	gin.DefaultWriter = core.GetLogIoWriter(core.GetConfigString("logger.gin_path"))
+	r := gin.Default()
+	//r.SetTrustedProxies([]string{"负载均衡,代理IP"})
+
+	//r.Delims("${", "}") //默认的{{}}和vue冲突,代码必须在LoadHTMLGlob前面
+	r.LoadHTMLGlob("view/**/*")
+	r.Static("/static", "./static")
+	return r
 }

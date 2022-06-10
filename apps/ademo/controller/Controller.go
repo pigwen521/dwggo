@@ -27,9 +27,9 @@ func (base *ControllerBase) CallBefore(ctx *gin.Context, current_action string) 
 	return true
 }
 
-func InitCtrlByName(str string) (reflect.Value, error) {
+func InitCtrlByName(ctrl_name string) (reflect.Value, error) {
 	var v reflect.Value
-	switch strings.ToLower(str) {
+	switch strings.ToLower(ctrl_name) {
 	case "ademo":
 		v = reflect.ValueOf(new(AdemoController))
 	case "home":
@@ -39,9 +39,9 @@ func InitCtrlByName(str string) (reflect.Value, error) {
 	//新增相应控制器代码
 	default:
 		if core.IsEnvDev() {
-			return reflect.Value{}, errors.New("控制器未配置？请在controller/Controller.go InitCtrlByName方法中完善case:" + str)
+			return reflect.Value{}, errors.New("控制器未配置？请在controller/Controller.go InitCtrlByName方法中完善case:" + ctrl_name)
 		} else {
-			return reflect.Value{}, errors.New("this controller is wrong：" + str)
+			return reflect.Value{}, errors.New("this controller is wrong：" + ctrl_name)
 		}
 	}
 	return v, nil

@@ -78,7 +78,7 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 - 控制器中的CallBefore为钩子方法，在运行acton之前运行，return false可阻断运行
 - 接口返回推荐：core.ResultFail(ctx,msg),core.ResultSucc(ctx,data)
 - 项目常量位置：consts/user_consts.go
-- 用户库位置：lib/
+- 用户库位置：userlib
 - 判断运行环境：core.IsEnvDev() core.IsEnvTest() core.IsEnvPro()
 - 数组方法：lib/helper/arrmap/arr.go InArrayStr() InArrayInt() IsArray()...
 - map方法：lib/helper/arrmap/map.go InMapStrKey() InMapStrVal() MergeMap()...

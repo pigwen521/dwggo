@@ -52,12 +52,12 @@ func Stop() {
 	}
 }
 
-func Start(initCtrlByNameCB InitCtrlByNameCB) {
+func Start(gin *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
 	defer core.ForPanicLog()
 	defer closeAll()
 
 	port := core.GetConfigString("app.port")
-	r := ginInit(initCtrlByNameCB)
+	r := ginInit(gin, initCtrlByNameCB)
 	//r.Run(":" + port)
 	srv := &http.Server{
 		Addr:    ":" + port,
@@ -110,16 +110,11 @@ func forShutdown(srv *http.Server) {
 	}
 }
 
-func ginInit(initCtrlByNameCB InitCtrlByNameCB) *gin.Engine {
-	gin.SetMode(core.GetConfigString("env"))
-	gin.DefaultWriter = core.GetLogIoWriter(core.GetConfigString("logger.gin_path"))
-	r := gin.Default()
-	//r.SetTrustedProxies([]string{"负载均衡,代理IP"})
+func ginInit(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) *gin.Engine {
+
 	middleWareLimiter(r)           //限流器
 	InitRoute(r, initCtrlByNameCB) //映射路由到控制器
 
-	r.Delims("${", "}") //默认的{{}}和vue冲突,代码必须在LoadHTMLGlob前面
-	r.LoadHTMLGlob("view/**/*")
 	return r
 }
 
