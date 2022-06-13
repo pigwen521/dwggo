@@ -106,9 +106,9 @@ func SendWarning(msg string) {
 	params["msg"] = msg
 	params["from"] = REPORT_WARNING_NAME
 	_, err := _PostForm(url, &params)
-	if err != nil {
+	if err != nil { //发送失败
 		fmt.Printf("err: %v\n", err)
-		//发送失败
+		loadErrorLogger().Error("发送告警异常：" + err.Error())
 	}
 }
 func _PostForm(url_str string, params ...*map[string]interface{}) (*string, error) {

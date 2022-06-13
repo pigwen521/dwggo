@@ -193,8 +193,9 @@ func doResp(err error, url_str string, resp *http.Response) (*string, error) {
 	}
 	body_str := string(body)
 	if resp.StatusCode != 200 {
-		core.LogError("resp.StatusCode is not 200," + url_str + "," + strconv.Itoa(resp.StatusCode))
-		return nil, errors.New("resp.StatusCode is not 200,it is:" + strconv.Itoa(resp.StatusCode) + ",body:" + body_str)
+		log_str := "resp.StatusCode is not 200,url:" + url_str + ",http_code:" + strconv.Itoa(resp.StatusCode) + ",body:" + body_str
+		core.LogError(log_str)
+		return nil, errors.New(log_str)
 	}
 
 	return &body_str, nil

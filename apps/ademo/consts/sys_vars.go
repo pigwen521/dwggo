@@ -8,7 +8,7 @@ const (
 	REPORT_WARNING_NAME = "XXX平台"
 )
 
-func Init() {
+func init() {
 	core.REPORT_WARNING_URL = REPORT_WARNING_URL
 	core.REPORT_WARNING_NAME = REPORT_WARNING_NAME
 }
