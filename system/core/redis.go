@@ -4,22 +4,23 @@ import (
 	"errors"
 	"time"
 
-	"github.com/garyburd/redigo/redis"
+	//"github.com/garyburd/redigo/redis"
+	"github.com/gomodule/redigo/redis"
 )
 
 var Redis_pool *redis.Pool
 
 /**
 1,
-myredis := MyRedis{}
-defer mr.Close()
+myredis := core.MyRedis{}
+defer myredis.Close()
 myredis.Set(key, val, ttl)
 val,err:=myredis.Get(key)
 if myredis.IsError(err) {
 	return err happend...
 }
 2,
-myredis := MyRedis{}
+myredis := core.MyRedis{}
 defer mr.Close()
 conn := myredis.GetConn()
 conn.Do("Set", "abc", 100, "EX", 100)
@@ -31,12 +32,16 @@ _, err := conn.Do("Set", "abc", 100, "EX", 100)
 res, err := redis.Int(conn.Do("Get", "abc"))
 */
 func init() {
+	host := GetConfigString("redis.host")
+	port := GetConfigString("redis.port")
+	password := redis.DialPassword(GetConfigString("redis.password"))
 	Redis_pool = &redis.Pool{ //实例化一个连接池
-		MaxIdle:     GetConfigInt("redis.MaxIdle"),                    //最初的连接数量
-		MaxActive:   GetConfigInt("redis.MaxActive"),                  //连接池最大连接数量,不确定可以用0（0表示自动定义），按需分配
-		IdleTimeout: time.Duration(GetConfigInt("redis.IdleTimeout")), //连接关闭时间 300秒 （300秒不使用自动关闭）
+		MaxIdle:     GetConfigInt("redis.MaxIdle"),                          //最大空闲连接
+		MaxActive:   GetConfigInt("redis.MaxActive"),                        //连接池最大连接数量,不确定可以用0（0表示自动定义），按需分配
+		IdleTimeout: time.Second * (GetConfigDuration("redis.IdleTimeout")), //连接关闭时间 300秒 （300秒不使用自动关闭）
+		//MaxConnLifetime: time.Second * ,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", GetConfigString("redis.host")+":"+GetConfigString("redis.port"), redis.DialPassword(GetConfigString("redis.password")))
+			return redis.Dial("tcp", host+":"+port, password)
 		},
 	}
 

@@ -18,6 +18,7 @@ import (
 
 const TIME_YMDHIS = "2006-01-02 15:04:05" //用于格式化时间YYYY-MM-DD HH:ii:ss
 const TIME_YMD = "2006-01-02"             //用于格式化时间YYYY-MM-DD
+const TIMEYMD = "20060102"                //用于格式化时间YYYY-MM-DD
 
 // 字符串首字母大写
 func FirstToUpper(str string) string {
@@ -270,11 +271,11 @@ func Base64_decode_byte(bytes []byte) []byte {
 }
 
 //日期时间格式转换
-//TimeFormat(str.TIME_YMD,"2021-12-01 12:30:30")
+//TimeFormat(str.TIME_YMD,str.TIME_YMDHIS,"2021-12-01 12:30:30")
 //return 2021-12-01
-func TimeFormat(format, input_date string) string {
+func TimeFormat(out_format, input_format, input_date string) string {
 	t, _ := time.Parse(TIME_YMDHIS, input_date)
-	return t.Format(format)
+	return t.Format(out_format)
 }
 func GetAgeByBirthday(birthday string) int {
 	t, err := time.Parse(TIME_YMD, birthday)

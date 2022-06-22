@@ -57,5 +57,6 @@ func initGin() *gin.Engine {
 	//r.Delims("${", "}") //默认的{{}}和vue冲突,代码必须在LoadHTMLGlob前面
 	r.LoadHTMLGlob("view/**/*")
 	r.Static("/static", "./static")
+	r.StaticFile("/favicon.ico", "./static/favicon.ico")
 	return r
 }

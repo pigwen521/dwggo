@@ -89,6 +89,7 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 业务代码都在apps;比如： ./user/login
 - 获取代码后修改mod name，替换代码中的：dsjk.com/dwggo
 - 新应用刚开始，复制apps/ademo => apps/YOUR_PROJECT_NAME，以后在该目录下编码
+- 替换文本内容：apps/ademo => apps/YOUR_PROJECT_NAME
 - 复制 ./controller ./entity ./model ./service下的 AdemoXXXX.go =》 UserXXXX.go
 - 修改上述文件中的type名称，如AdemoXXXX => AdemoUser
 - 添加控制器映射：./mygin/router.go->InitCtrlByName方法中增加
