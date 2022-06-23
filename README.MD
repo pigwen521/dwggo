@@ -47,6 +47,23 @@ var obj entity.Ademo
 orm := core.Db
 orm.Where("name=?", name).Find(&obj)
 ```
+### session会话
+- 用法：
+```go
+	session, err := core.InitSession(ctx.Request, ctx.Writer)
+	if err != nil {
+		//err
+	}
+
+	//保存值
+	err = session.Save("foo", time.Now().Local().String())
+
+	//取值
+	foo := session.Get("foo")
+
+	//清空session-退出
+	err = session.Del()
+```
 ### Redis
 - 封装后的写法（仅get set del，请求方法不全，可以自行完善）
 ```go
