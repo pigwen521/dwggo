@@ -75,6 +75,12 @@ func InitRoute(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
 	}).POST(root_path+":ctrl/:action", func(ctx *gin.Context) {
 		routerTwoLevel(ctx, initCtrlByNameCB)
 	})
+
+	r.GET(root_path+":ctrl/:action/:action2", func(ctx *gin.Context) {
+		routerTwoLevel(ctx, initCtrlByNameCB)
+	}).POST(root_path+":ctrl/:action/:action2", func(ctx *gin.Context) {
+		routerTwoLevel(ctx, initCtrlByNameCB)
+	})
 }
 
 //:ctrl/:action 两级路由
