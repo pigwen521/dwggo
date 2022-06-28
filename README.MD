@@ -35,10 +35,10 @@
 - 内置的limiter，令牌生成速率和容量见配置文件limiter
 ### API接口请求
 默认会记录日志（请求参数和响应返回内容）
-- GET：myapi.Api(url,myapi.MYAPI_METHOD_GET,map_data)
-- POST-json：myapi.Api(url,myapi.MYAPI_METHOD_JSON,map_data)
-- POST-form：myapi.Api(url,myapi.MYAPI_METHOD_POST_FORM,map_data)
-- POST-text：myapi.Api(url,myapi.MYAPI_METHOD_POST_TEXT,map_data)
+- GET：myapi.Api(url,myapi.MYAPI_METHOD_GET,map_data,headers)
+- POST-json：myapi.Api(url,myapi.MYAPI_METHOD_JSON,map_data,headers)
+- POST-form：myapi.Api(url,myapi.MYAPI_METHOD_POST_FORM,map_data,headers)
+- POST-text：myapi.Api(url,myapi.MYAPI_METHOD_POST_TEXT,myapi.SetPostText(text),headers)
 - 不记录请求和响应日志：myapi.ApiNoAllLog
 - 不记录响应日志：myapi.ApiNoResponsLog
 ### Mysql

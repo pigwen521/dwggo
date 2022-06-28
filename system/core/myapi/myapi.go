@@ -17,18 +17,41 @@ import (
 )
 
 const (
-	MYAPI_METHOD_GET       = "GET"
-	MYAPI_METHOD_POST_JSON = "JSON"
-	MYAPI_METHOD_POST_FORM = "POST"
-	//POST请求发送文本内容，不是json。。
-	// params_tmp := map[string]interface{}{}
-	// params_tmp[myapi.MYAPI_POST_TEXT_CONTENT] = 文本内容
-	// res, err := self.Api(url_str, myapi.MYAPI_METHOD_POST_TEXT, &params_tmp)
-	MYAPI_METHOD_POST_TEXT  = "POST_TEXT"
-	MYAPI_METHOD_WEBSERVICE = "WEBSERVICE"
+	MYAPI_METHOD_GET  = "GET"
+	MYAPI_METHOD_POST = "POST"
+
+	MYAPI_METHOD_POST_JSON = "POST_JSON"
+	MYAPI_METHOD_POST_FORM = "POST_FORM"
+	//1,POST请求发送文本内容，不是json。。
+	//res, err := self.Api(url_str, myapi.MYAPI_METHOD_POST_TEXT, myapi.SetPostText("text_conent"))
+	//2,POST请求发送文本内容，不是json。。指定contentType，自定义header
+	// headers := map[string]interface{}{}
+	// headers[myapi.MYAPI_HEADER_CONTENTTYPE] = myapi.MYAPI_CONTENTTYPE_SOAP1_1
+	// headers["SOAPAction"] = self.OrgEntity.Orgapi.OrgapiAccounts[0].Appother1
+	// res, err := myapi.Api(url_str, myapi.MYAPI_METHOD_POST_TEXT, myapi.SetPostText(xml_req), headers)
+	MYAPI_METHOD_POST_TEXT = "POST_TEXT"
+	//MYAPI_METHOD_WEBSERVICE = "WEBSERVICE"
 
 	MYAPI_POST_TEXT_CONTENT = "_content_"
+
+	MYAPI_HEADER_CONTENTTYPE = "Content-Type"
+
+	MYAPI_CONTENTTYPE_JSON     = "application/json;charset=UTF-8"
+	MYAPI_CONTENTTYPE_WWW_FORM = "application/x-www-form-urlencoded"
+	MYAPI_CONTENTTYPE_SOAP1_1  = "text/xml;charset=UTF-8"
+	MYAPI_CONTENTTYPE_SOAP1_2  = "application/soap+xml;charset=UTF-8"
 )
+
+func SetPostText(val string) map[string]interface{} {
+	params_tmp := map[string]interface{}{}
+	params_tmp[MYAPI_POST_TEXT_CONTENT] = val
+	return params_tmp
+}
+func SetContentType(val string) map[string]interface{} {
+	params_tmp := map[string]interface{}{}
+	params_tmp[MYAPI_HEADER_CONTENTTYPE] = val
+	return params_tmp
+}
 
 //API请求-回写请求和响应日志
 func Api(url_str string, method string, params ...map[string]interface{}) (*string, error) {
@@ -111,7 +134,8 @@ func Get(url_str string, params ...map[string]interface{}) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := http.Get(url_str)
+	//resp, err := http.Get(url_str)
+	err, resp := doHttpRequest(url_str, MYAPI_METHOD_GET, nil, params, "")
 	return doResp(err, url_str, resp)
 }
 
@@ -129,13 +153,14 @@ func PostForm(url_str string, params ...map[string]interface{}) (*string, error)
 	if len(params) == 0 {
 		return nil, errors.New("post param is request")
 	}
-	//options := params[1] TODO
 
 	urlValues := url.Values{}
 	for k, v := range params[0] {
 		urlValues.Add(k, str.ToString(v))
 	}
-	resp, err := http.PostForm(url_str, urlValues)
+	//resp, err := http.PostForm(url_str, urlValues)
+	//c.Post(url, "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))
+	err, resp := doHttpRequest(url_str, MYAPI_METHOD_POST, []byte(urlValues.Encode()), params, MYAPI_CONTENTTYPE_WWW_FORM)
 	return doResp(err, url_str, resp)
 }
 
@@ -160,7 +185,11 @@ func PostJson(url_str string, params ...map[string]interface{}) (*string, error)
 		core.LogError(url_str + "," + err.Error())
 		return nil, err
 	}
-	resp, err := http.Post(url_str, "application/json", bytes.NewReader(bytesData))
+	//resp, err := http.Post(url_str, "application/json", bytes.NewReader(bytesData))
+
+	//设置自定义header
+	err, resp := doHttpRequest(url_str, MYAPI_METHOD_POST, bytesData, params, MYAPI_CONTENTTYPE_JSON)
+
 	return doResp(err, url_str, resp)
 }
 
@@ -169,14 +198,36 @@ func PostText(url_str string, params ...map[string]interface{}) (*string, error)
 	if len(params) == 0 {
 		return nil, errors.New("post param is request")
 	}
-	//options := params[1] TODO
 
 	bytesData, ok := (params[0])[MYAPI_POST_TEXT_CONTENT]
 	if !ok {
 		return nil, errors.New("post param miss:" + MYAPI_POST_TEXT_CONTENT)
 	}
-	resp, err := http.Post(url_str, "application/json", bytes.NewReader([]byte(str.ToString(bytesData))))
+
+	err, resp := doHttpRequest(url_str, MYAPI_METHOD_POST, []byte(str.ToString(bytesData)), params, MYAPI_CONTENTTYPE_JSON)
+	//resp, err := http.Post(url_str, content_type, bytes.NewReader([]byte(str.ToString(bytesData))))
 	return doResp(err, url_str, resp)
+}
+
+func doHttpRequest(url_str string, method string, post_content []byte, params []map[string]interface{}, default_content_type string) (error, *http.Response) {
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url_str, bytes.NewReader(post_content))
+	if err != nil {
+		return err, nil
+	}
+	//自定义header
+	if default_content_type != "" {
+		req.Header.Set(MYAPI_HEADER_CONTENTTYPE, default_content_type)
+	}
+	if len(params) > 1 {
+		options := params[1]
+		for k, v := range options {
+			req.Header.Set(k, str.ToString(v))
+		}
+	}
+
+	resp, err := client.Do(req)
+	return err, resp
 }
 
 func doResp(err error, url_str string, resp *http.Response) (*string, error) {
