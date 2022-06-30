@@ -5,36 +5,17 @@ import (
 	"dsjk.com/dwggo/apps/ademo/model"
 	"dsjk.com/dwggo/system/core"
 	"dsjk.com/dwggo/system/lib/helper/str"
-	"gorm.io/gorm"
 )
 
 type AdemoService struct{}
 
-func (service *AdemoService) FindOne(name string) entity.Ademo {
+func (ser *AdemoService) Query(arg model.ArgAdemoQueryInModel) (*model.ArgAdemoQueryOutModel, error) {
 	var obj entity.Ademo
 	orm := core.Db
-	orm.Where("name=?", name).Find(&obj)
-	return obj
-}
-func (ser *AdemoService) Query(arg model.ArgAdemoQueryInModel) (*model.ArgAdemoQueryOutModel, error) {
-	var ademo entity.Ademo
-	t := ser.BuildCond(arg)
-	err := t.Find(&ademo).Error
-	if err != nil {
-		return nil, err
-	}
+	orm.Where("name=?", arg.Name).Find(&obj)
 
 	arg_out := model.ArgAdemoQueryOutModel{}
-	arg_out.ID = str.ToString(ademo.ID)
-	arg_out.Name = ademo.Name
+	arg_out.ID = str.ToString(obj.ID)
+	arg_out.Name = obj.Name
 	return &arg_out, nil
-}
-
-func (ser *AdemoService) BuildCond(arg model.ArgAdemoQueryInModel) *gorm.DB {
-	orm := core.Db
-	t := orm.Where("id>0")
-	if arg.Name != "" {
-		t.Where("name =?", arg.Name)
-	}
-	return t
 }

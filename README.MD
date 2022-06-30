@@ -119,7 +119,10 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 - 支持start/stop/restart
 - 开发环境：go run main.go start/stop/restart
 - 生产环境：xxx start/stop/restart &
-
+## 发布
+- 编译 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o xxxxx main.go 
+- 部署xxxxx文件，config，view 目录到服务器
+- 运行：xxxxx start/stop/restart &
 ## 联系我
 - 409250643@qq.com
 
