@@ -11,6 +11,16 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+/**
+用法：
+- core.LogError("log...")
+- core.LogInfo("log...")
+- core.LogDebug("log...")
+- core.LogErrorAndPanic("log...")
+#### 自定义日志文件
+- core.LogErrorCustom("log...",FILE_NAME)
+- core.LogInfoCustom("log...",FILE_NAME)
+*/
 var logger_customs map[string]*zap.Logger
 
 /**

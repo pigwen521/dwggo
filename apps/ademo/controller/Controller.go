@@ -23,7 +23,7 @@ func (base *ControllerBase) Index(ctx *gin.Context) {
 钩子方法，在action运行之前执行
 重写该方法，return false可阻断action的执行
 */
-func (base *ControllerBase) CallBefore(ctx *gin.Context, current_action string) bool {
+func (base *ControllerBase) CallBefore(ctx *gin.Context, current_ctrl, current_action string) bool {
 	return true
 }
 

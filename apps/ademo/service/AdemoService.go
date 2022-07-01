@@ -12,7 +12,9 @@ type AdemoService struct{}
 func (ser *AdemoService) Query(arg model.ArgAdemoQueryInModel) (*model.ArgAdemoQueryOutModel, error) {
 	var obj entity.Ademo
 	orm := core.Db
-	orm.Where("name=?", arg.Name).Find(&obj)
+
+	field_name := core.GetFieldAlias(obj, obj.Name)
+	orm.Where(field_name+"=?", arg.Name).Find(&obj)
 
 	arg_out := model.ArgAdemoQueryOutModel{}
 	arg_out.ID = str.ToString(obj.ID)

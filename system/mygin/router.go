@@ -38,10 +38,11 @@ func callMethodByAction(v reflect.Value, act string, ctx *gin.Context) ([]reflec
 		params[0] = reflect.ValueOf(ctx)
 		v.MethodByName(action).Call(params) */
 }
-func callMiddleWare(v reflect.Value, action string, ctx *gin.Context, cur_action string) []reflect.Value {
-	params := make([]reflect.Value, 2)
+func callMiddleWare(v reflect.Value, action string, ctx *gin.Context, cur_ctrl, cur_action string) []reflect.Value {
+	params := make([]reflect.Value, 3)
 	params[0] = reflect.ValueOf(ctx)
-	params[1] = reflect.ValueOf(cur_action)
+	params[1] = reflect.ValueOf(strings.ToLower(cur_ctrl))
+	params[2] = reflect.ValueOf(strings.ToLower(cur_action))
 	return v.MethodByName(action).Call(params)
 }
 func PageNotFound(ctx *gin.Context) {
@@ -116,7 +117,7 @@ func executCtrlAction(ctx *gin.Context, ctrl string, action string, initCtrlByNa
 		return
 	}
 
-	call_ret := callMiddleWare(v, "CallBefore", ctx, action)
+	call_ret := callMiddleWare(v, "CallBefore", ctx, ctrl, action)
 	if !call_ret[0].Interface().(bool) {
 		return
 	}

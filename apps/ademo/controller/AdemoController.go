@@ -21,7 +21,7 @@ type AdemoController struct {
 钩子方法，在action运行之前执行
 重写该方法，return false可阻断action的执行
 */
-func (base *AdemoController) CallBefore(ctx *gin.Context, current_action string) bool {
+func (base *AdemoController) CallBefore(ctx *gin.Context, current_ctrl, current_action string) bool {
 	return true
 }
 func (ctrl *AdemoController) Index(ctx *gin.Context) {

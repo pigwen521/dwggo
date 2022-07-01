@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/gob"
 	"errors"
 	"net/http"
 
@@ -12,8 +13,8 @@ var Session_store *redistore.RediStore
 var session_name string
 
 /**
-用法：
-	session, err := core.InitSession(ctx.Request, ctx.Writer)
+用法1：
+	session, err := core.InitSession(ctx.Request, ctx.Writer,entity.user{})
 	if err != nil {
 		//err
 	}
@@ -26,6 +27,15 @@ var session_name string
 
 	//清空session-退出
 	err = session.Del()
+
+用法2：
+默认一个固定的key,const SESS_USER_KEY = "gin_user"
+	//保存
+	err:=core.SaveUserSess(ctx,val,entity.user{})
+	//取值
+	val,err:=err:=GetUserSess(ctx,,entity.user{})
+	//清空退出
+	err:=DelUserSess(ctx)
 */
 func init() {
 	session_name = GetConfigString("session.name")
@@ -60,8 +70,16 @@ type Session struct {
 }
 
 //初试session-(配置文件的session.name)
-func InitSession(req *http.Request, rpw http.ResponseWriter) (*Session, error) {
-	return InitSessionBySessname(req, rpw, session_name)
+func InitSession(req *http.Request, rpw http.ResponseWriter, reg_vals ...interface{}) (*Session, error) {
+	for _, reg_val := range reg_vals {
+		gob.Register(reg_val)
+	}
+
+	sess, err := InitSessionBySessname(req, rpw, session_name)
+	if err != nil {
+		LogError("初试化session失败，" + err.Error())
+	}
+	return sess, err
 }
 
 //初试session-指定session_name
@@ -89,7 +107,11 @@ func (self *Session) getSessionBySessname(req *http.Request, rpw http.ResponseWr
 //清除默认session
 func (self *Session) Del() error {
 	self.Sess.Options.MaxAge = -1
-	return self.Sess.Save(self.req, self.rpw)
+	err := self.Sess.Save(self.req, self.rpw)
+	if err != nil {
+		LogError("del session失败，" + err.Error())
+	}
+	return err
 }
 
 //获取session内容
@@ -100,5 +122,9 @@ func (self *Session) Get(session_key string) interface{} {
 //保存session
 func (self *Session) Save(session_key string, session_val interface{}) error {
 	self.Sess.Values[session_key] = session_val
-	return self.Sess.Save(self.req, self.rpw)
+	err := self.Sess.Save(self.req, self.rpw)
+	if err != nil {
+		LogError("save session失败，" + err.Error())
+	}
+	return err
 }

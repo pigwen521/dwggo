@@ -12,7 +12,7 @@ type TestController struct {
 	ControllerBase
 }
 
-func (base *TestController) CallBefore(ctx *gin.Context, current_action string) bool {
+func (base *TestController) CallBefore(ctx *gin.Context, current_ctrl, current_action string) bool {
 	return true
 }
 func (ctrl *TestController) Index(ctx *gin.Context) {
