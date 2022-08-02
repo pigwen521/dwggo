@@ -17,11 +17,13 @@ import (
 	"dsjk.com/dwggo/system/lib/helper/str"
 	"dsjk.com/dwggo/system/lib/helper/str/verify"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/render"
 	"golang.org/x/time/rate"
 )
 
 var pid_file string       //save PID for stop
 var limiter *rate.Limiter //限流器
+var MyginEngin *gin.Engine
 
 func init() {
 	port := core.GetConfigString("app.port")
@@ -114,8 +116,21 @@ func ginInit(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) *gin.Engine {
 
 	middleWareLimiter(r)           //限流器
 	InitRoute(r, initCtrlByNameCB) //映射路由到控制器
-
+	MyginEngin = r
 	return r
+}
+
+//判断模板文件是否存在
+//if mygin.IsExistTemplateFile("home/index.html") )
+func IsExistTemplateFile(tmp_file string) bool {
+	if gin.IsDebugging() {
+		aa := (MyginEngin.HTMLRender).(render.HTMLDebug)
+		ren := aa.Instance(tmp_file, nil).(render.HTML)
+		return ren.Template.Lookup(tmp_file) != nil
+	} else {
+		aa := (MyginEngin.HTMLRender).(render.HTMLProduction)
+		return aa.Template.Lookup(tmp_file) != nil
+	}
 }
 
 //限流器中间件

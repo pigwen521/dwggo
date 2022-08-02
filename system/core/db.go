@@ -22,6 +22,10 @@ func init() {
 	database := GetConfigString("database.database")
 	username := GetConfigString("database.username")
 	password := GetConfigString("database.password")
+	if host == "" {
+		LogInfo("database.host未配置，db未初始化")
+		return
+	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, host, port, database)
 	var err error

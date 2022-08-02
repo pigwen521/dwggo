@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/boj/redistore"
 	"github.com/gorilla/sessions"
@@ -11,6 +12,10 @@ import (
 
 var Session_store *redistore.RediStore
 var session_name string
+
+const ROLLING_TIME_SESS_KEY = "__rolling_time__"
+
+var ROLLING_INTERVAL_SECOND = time.Second.Nanoseconds() * 60 //刷新间隔时间，默认60(秒)，刚刷过60秒内不再刷
 
 /**
 用法1：
@@ -64,9 +69,11 @@ func init() {
 }
 
 type Session struct {
-	Sess *sessions.Session
-	req  *http.Request
-	rpw  http.ResponseWriter
+	Sess      *sessions.Session
+	req       *http.Request
+	rpw       http.ResponseWriter
+	IsRolling bool //是否每次请求都刷新过期时间，默认true
+	isFresh   bool //是否刷新过有效期，一次请求只刷新一次
 }
 
 //初试session-(配置文件的session.name)
@@ -85,6 +92,8 @@ func InitSession(req *http.Request, rpw http.ResponseWriter, reg_vals ...interfa
 //初试session-指定session_name
 func InitSessionBySessname(req *http.Request, rpw http.ResponseWriter, sess_name string) (*Session, error) {
 	sess := Session{}
+	sess.IsRolling = true
+	sess.isFresh = false
 	err := sess.getSessionBySessname(req, rpw, sess_name)
 	return &sess, err
 }
@@ -116,6 +125,15 @@ func (self *Session) Del() error {
 
 //获取session内容
 func (self *Session) Get(session_key string) interface{} {
+	if self.IsRolling && !self.isFresh { //获取的时候顺便刷新下过期时间
+		last_roll_time, has := self.Sess.Values[ROLLING_TIME_SESS_KEY]
+		if !has || (last_roll_time.(int64) < (time.Now().UnixNano() - ROLLING_INTERVAL_SECOND)) { //不存在，或超过了60秒，就刷新
+			self.isFresh = true
+			self.Save(ROLLING_TIME_SESS_KEY, time.Now().UnixNano()) //每次请求都刷新过期时间。。
+			//self.SaveNoWithVal()
+		}
+	}
+
 	return self.Sess.Values[session_key]
 }
 

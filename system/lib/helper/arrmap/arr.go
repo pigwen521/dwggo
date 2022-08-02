@@ -4,8 +4,8 @@ import (
 	"reflect"
 )
 
-func InArrayStr(val string, arrs *[]string) bool {
-	for _, v := range *arrs {
+func InArrayStr(val string, arrs []string) bool {
+	for _, v := range arrs {
 		if val == v {
 			return true
 		}
@@ -14,8 +14,8 @@ func InArrayStr(val string, arrs *[]string) bool {
 }
 
 //数组
-func InArrayInt(val int, arrs *[]int) bool {
-	for _, v := range *arrs {
+func InArrayInt(val int, arrs []int) bool {
+	for _, v := range arrs {
 		if val == v {
 			return true
 		}
