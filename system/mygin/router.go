@@ -51,6 +51,7 @@ func PageNotFound(ctx *gin.Context) {
 
 func InitRoute(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
 	root_path := core.GetConfigString("app.path")
+
 	if root_path != "/" { //站点目录非根目录
 		r.GET("/", func(ctx *gin.Context) {
 			routerZeroLevel(ctx, initCtrlByNameCB)
@@ -65,36 +66,25 @@ func InitRoute(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
 		routerZeroLevel(ctx, initCtrlByNameCB)
 	})
 
-	r.GET(root_path+":ctrl", func(ctx *gin.Context) {
-		routerOneLevel(ctx, initCtrlByNameCB)
-	}).POST(root_path+":ctrl", func(ctx *gin.Context) {
-		routerOneLevel(ctx, initCtrlByNameCB)
+	r.GET(root_path+":ctrl/*actions", func(ctx *gin.Context) {
+		routerAllLevel(ctx, initCtrlByNameCB)
+	}).POST(root_path+":ctrl/*actions", func(ctx *gin.Context) {
+		routerAllLevel(ctx, initCtrlByNameCB)
 	})
 
-	r.GET(root_path+":ctrl/:action", func(ctx *gin.Context) {
-		routerTwoLevel(ctx, initCtrlByNameCB)
-	}).POST(root_path+":ctrl/:action", func(ctx *gin.Context) {
-		routerTwoLevel(ctx, initCtrlByNameCB)
-	})
-
-	r.GET(root_path+":ctrl/:action/:action2", func(ctx *gin.Context) {
-		routerTwoLevel(ctx, initCtrlByNameCB)
-	}).POST(root_path+":ctrl/:action/:action2", func(ctx *gin.Context) {
-		routerTwoLevel(ctx, initCtrlByNameCB)
-	})
 }
 
-//:ctrl/:action 两级路由
-func routerTwoLevel(ctx *gin.Context, initCtrlByNameCB InitCtrlByNameCB) {
+//:ctrl/*actions 全部。多级
+func routerAllLevel(ctx *gin.Context, initCtrlByNameCB InitCtrlByNameCB) {
 	ctrl := ctx.Param("ctrl")
-	action := str.FirstToUpper(ctx.Param("action"))
-	executCtrlAction(ctx, ctrl, action, initCtrlByNameCB)
-}
-
-//:ctrl 没action 一级路由
-func routerOneLevel(ctx *gin.Context, initCtrlByNameCB InitCtrlByNameCB) {
-	ctrl := ctx.Param("ctrl")
-	action := core.GetConfigString("router.default_action")
+	action := ""
+	actions := ctx.Param("actions") // / /act1	/act1/act2	/act1/act2/act3
+	act_arr := strings.Split(actions, "/")
+	if actions == "/" {
+		action = str.FirstToUpper(core.GetConfigString("router.default_action"))
+	} else {
+		action = str.FirstToUpper(act_arr[1])
+	}
 	executCtrlAction(ctx, ctrl, action, initCtrlByNameCB)
 }
 
@@ -116,12 +106,10 @@ func executCtrlAction(ctx *gin.Context, ctrl string, action string, initCtrlByNa
 		PageNotFound(ctx)
 		return
 	}
-
 	call_ret := callMiddleWare(v, "CallBefore", ctx, ctrl, action)
 	if !call_ret[0].Interface().(bool) {
 		return
 	}
-
 	_, err = callMethodByAction(v, action, ctx)
 	if err != nil {
 		core.LogWarning(err.Error())

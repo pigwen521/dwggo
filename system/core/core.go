@@ -18,6 +18,11 @@ import (
 var config_files = []string{"./config/config.yaml", "./config/secret.yaml", "./config/system.yaml"}
 var config *viper.Viper
 
+var config_cache_string = map[string]string{}
+var config_cache_int = map[string]int{}
+var config_cache_duration = map[string]time.Duration{}
+var config_cache_float64 = map[string]float64{}
+
 func init() {
 	loadConfig()
 	LogInfo("load config0:" + config_files[0])
@@ -36,13 +41,20 @@ func loadConfig() {
 	//port := config.GetString("app.port")
 }
 func GetConfigString(key string) string {
+	if cache, ok := config_cache_string[key]; ok {
+		return cache
+	}
 	str := config.GetString(key)
 	if str == "" { //疑似配错，提示
 		fmt.Println("GetConfigString is empty", key)
 	}
+	config_cache_string[key] = str
 	return str
 }
 func GetConfigInt(key string) int {
+	if cache, ok := config_cache_int[key]; ok {
+		return cache
+	}
 	ret := config.GetInt(key)
 	if ret == 0 { //疑似配错，提示
 		ret_true := config.Get(key)
@@ -50,9 +62,13 @@ func GetConfigInt(key string) int {
 			fmt.Println("GetConfigInt is empty", key)
 		}
 	}
+	config_cache_int[key] = ret
 	return ret
 }
 func GetConfigDuration(key string) time.Duration {
+	if cache, ok := config_cache_duration[key]; ok {
+		return cache
+	}
 	ret := config.GetDuration(key)
 	if ret == 0 { //疑似配错，提示
 		ret_true := config.Get(key)
@@ -60,9 +76,13 @@ func GetConfigDuration(key string) time.Duration {
 			fmt.Println("GetConfigDuration is empty", key)
 		}
 	}
+	config_cache_duration[key] = ret
 	return ret
 }
 func GetConfigFloat64(key string) float64 {
+	if cache, ok := config_cache_float64[key]; ok {
+		return cache
+	}
 	ret := config.GetFloat64(key)
 	if ret == 0 { //疑似配错，提示
 		ret_true := config.Get(key)
@@ -70,6 +90,7 @@ func GetConfigFloat64(key string) float64 {
 			fmt.Println("GetConfigFloat64 is empty", key)
 		}
 	}
+	config_cache_float64[key] = ret
 	return ret
 }
 

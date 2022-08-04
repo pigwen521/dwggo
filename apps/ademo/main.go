@@ -54,7 +54,7 @@ func initGin() *gin.Engine {
 	r := gin.Default()
 	//r.SetTrustedProxies([]string{"负载均衡,代理IP"})
 
-	//r.Delims("${", "}") //默认的{{}}和vue冲突,代码必须在LoadHTMLGlob前面
+	r.Delims("${", "}") //默认的{{}}和vue冲突,代码必须在LoadHTMLGlob前面
 	r.LoadHTMLGlob("view/**/*")
 	r.Static("/static", "./static")
 	r.StaticFile("/favicon.ico", "./static/favicon.ico")

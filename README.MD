@@ -103,10 +103,10 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 - 正则验证：lib/helper/str/verify/verify.go IsDate() IsTime() IsNumber()...
 
 ## 开始编码
-业务代码都在apps;比如： ./user/login
-- 获取代码后修改mod name，替换代码中的：dsjk.com/dwggo
-- 新应用刚开始，复制apps/ademo => apps/YOUR_PROJECT_NAME，以后在该目录下编码
-- 替换文本内容：apps/ademo => apps/YOUR_PROJECT_NAME
+业务代码都在apps;比如,应用名:YOUR_APP_NAME,路由:./user/login
+- 获取代码后修改mod name，替换全部代码中的：dsjk.com/dwggo
+- 新应用刚开始，复制apps/ademo => apps/YOUR_APP_NAME，以后在该目录下编码
+- 替换apps/YOUR_APP_NAME目录下的文本内容：apps/ademo => apps/YOUR_APP_NAME
 - 复制 ./controller ./entity ./model ./service下的 AdemoXXXX.go =》 UserXXXX.go
 - 修改上述文件中的type名称，如AdemoXXXX => AdemoUser
 - 添加控制器映射：./mygin/router.go->InitCtrlByName方法中增加
@@ -115,7 +115,7 @@ res, err := redis.Int(conn.Do("Get", "abc"))
 - 开始编码：UserController.go -> login()
 
 ## 启动运行
-在apps/YOUR_PROJECT_NAME/目录下
+在apps/YOUR_APP_NAME/目录下
 - 支持start/stop/restart
 - 开发环境：go run main.go start/stop/restart
 - 生产环境：xxx start/stop/restart &
