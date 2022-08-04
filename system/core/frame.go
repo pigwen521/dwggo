@@ -66,7 +66,7 @@ func SiteUrl(uri string) string {
 return [act1,act2]
 */
 func GetActions(ctx *gin.Context) []string {
-	actions := strings.TrimPrefix(ctx.Param("actions"), "/") // / /act1	/act1/act2	/act1/act2/act3
+	actions := strings.Trim(ctx.Param("actions"), "/") // / /act1	/act1/act2	/act1/act2/act3
 	if actions == "" {
 		actions = strings.ToLower(GetConfigString("router.default_action"))
 	}
