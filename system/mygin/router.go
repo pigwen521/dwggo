@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"dsjk.com/dwggo/system/core"
-	"dsjk.com/dwggo/system/lib/helper/str"
 
 	"github.com/gin-gonic/gin"
 )
@@ -66,6 +65,12 @@ func InitRoute(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
 		routerZeroLevel(ctx, initCtrlByNameCB)
 	})
 
+	r.GET(root_path+":ctrl", func(ctx *gin.Context) {
+		routerOneLevel(ctx, initCtrlByNameCB)
+	}).POST(root_path+":ctrl", func(ctx *gin.Context) {
+		routerOneLevel(ctx, initCtrlByNameCB)
+	})
+
 	r.GET(root_path+":ctrl/*actions", func(ctx *gin.Context) {
 		routerAllLevel(ctx, initCtrlByNameCB)
 	}).POST(root_path+":ctrl/*actions", func(ctx *gin.Context) {
@@ -77,14 +82,14 @@ func InitRoute(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
 //:ctrl/*actions 全部。多级
 func routerAllLevel(ctx *gin.Context, initCtrlByNameCB InitCtrlByNameCB) {
 	ctrl := ctx.Param("ctrl")
-	action := ""
-	actions := ctx.Param("actions") // / /act1	/act1/act2	/act1/act2/act3
-	act_arr := strings.Split(actions, "/")
-	if actions == "/" {
-		action = str.FirstToUpper(core.GetConfigString("router.default_action"))
-	} else {
-		action = str.FirstToUpper(act_arr[1])
-	}
+	actions := core.GetActions(ctx)
+	executCtrlAction(ctx, ctrl, actions[0], initCtrlByNameCB)
+}
+
+//:ctrl 没action 一级路由
+func routerOneLevel(ctx *gin.Context, initCtrlByNameCB InitCtrlByNameCB) {
+	ctrl := ctx.Param("ctrl")
+	action := core.GetConfigString("router.default_action")
 	executCtrlAction(ctx, ctrl, action, initCtrlByNameCB)
 }
 

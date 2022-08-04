@@ -7,6 +7,7 @@ lishaowen
 import (
 	"net/http"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -53,4 +54,21 @@ func ReturnSucc(ctx *gin.Context, data interface{}) interface{} {
 }
 func ReturnJson(ctx *gin.Context, code int, data interface{}, msg string) interface{} {
 	return gin.H{"code": code, "data": data, "msg": msg}
+}
+
+func SiteUrl(uri string) string {
+	return GetConfigString("app.site_root") + uri
+}
+
+/**
+返回当前请求的actions
+./user/act1/act2
+return [act1,act2]
+*/
+func GetActions(ctx *gin.Context) []string {
+	actions := strings.TrimPrefix(ctx.Param("actions"), "/") // / /act1	/act1/act2	/act1/act2/act3
+	if actions == "" {
+		actions = strings.ToLower(GetConfigString("router.default_action"))
+	}
+	return strings.Split(actions, "/")
 }
