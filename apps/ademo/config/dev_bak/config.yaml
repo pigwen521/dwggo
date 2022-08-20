@@ -16,10 +16,14 @@ logger:         #user log
 
 app:
   name: 项目名称
+  scheme: http #http https
   domain: http://localhost
   port: 8080
   path: / #站点URL的根目录可带子目录访问,/结尾，如：/或/project_name/
   version: v0.1
+ssl:  #app.scheme为https生效
+  certFile: #.pem
+  keyFile: #.key
 
 limiter:  #限流器
   rate_second: 100 #每秒生成多个可用令牌，单机qps，不开启设置0

@@ -74,7 +74,19 @@ func listenAndServer(srv *http.Server, port string) {
 	old_pid, _ := getOldPid()
 	helper.WriteFile(pid_file, &pid)
 
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	var err error
+	if core.GetConfigString("app.scheme") == "https" { //HTTPS证书
+		certFile := core.GetConfigString("ssl.certFile")
+		keyFile := core.GetConfigString("ssl.keyFile")
+		if certFile == "" || keyFile == "keyFile" {
+			core.LogErrorAndPanic("https时certFile,keyFile不能为空")
+		}
+		err = srv.ListenAndServeTLS(certFile, keyFile)
+	} else {
+		err = srv.ListenAndServe()
+	}
+	
+	if err != nil && err != http.ErrServerClosed {
 		cmdLog("start error:" + err.Error())
 		helper.WriteFile(pid_file, &old_pid) //启动失败，写回去
 		os.Exit(0)
