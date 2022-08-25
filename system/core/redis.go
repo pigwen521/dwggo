@@ -15,10 +15,14 @@ var Redis_pool *redis.Pool
 myredis := core.MyRedis{}
 defer myredis.Close()
 myredis.Set(key, val, ttl)
-val,err:=myredis.Get(key)
+val,err:= redis.String(myredis.Get(key))
 if myredis.IsError(err) {
 	return err happend...
 }
+if val!= ""{
+	//cached
+}
+
 2,
 myredis := core.MyRedis{}
 defer mr.Close()

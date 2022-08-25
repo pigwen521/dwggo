@@ -19,7 +19,7 @@ app:
   scheme: http #http https
   domain: localhost
   port: 8080
-  path: / #站点URL的根目录可带子目录访问,/结尾，如http://127.0.0.1/myproject/ 就配置：myproject/
+  path: / #站点URL的根目录可带子目录访问,/结尾，如http://127.0.0.1/myproject/ 就配置：/myproject/
   version: v0.1
 ssl:  #app.scheme为https生效
   certFile: #.pem

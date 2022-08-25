@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"dsjk.com/dwggo/system/lib/helper/str"
@@ -24,20 +25,30 @@ var config_cache_duration = map[string]time.Duration{}
 var config_cache_float64 = map[string]float64{}
 
 func init() {
-	loadConfig()
-	LogInfo("load config0:" + config_files[0])
+	files, err := loadConfig()
+	if err != nil {
+		LogErrorAndPanic(err.Error())
+	}
+	LogInfo("load configs:" + strings.Join(files, ","))
 }
 
-func loadConfig() {
+func loadConfig() ([]string, error) {
 	config = viper.New()
+	var err error
+	var files []string
 	for index, arr := range config_files {
 		config.SetConfigFile(arr)
 		if index == 0 {
-			config.ReadInConfig()
+			err = config.ReadInConfig()
 		} else {
-			config.MergeInConfig()
+			err = config.MergeInConfig()
 		}
+		if err != nil {
+			return files, errors.New("读取配置文件错误" + arr + ",err:" + err.Error())
+		}
+		files = append(files, arr)
 	}
+	return files, err
 	//port := config.GetString("app.port")
 }
 func GetConfigString(key string) string {
