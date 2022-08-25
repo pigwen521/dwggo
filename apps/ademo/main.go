@@ -40,8 +40,7 @@ func cmd() {
 		mygin.Stop()
 	case "restart":
 		log.Println("restart ing...")
-		mygin.Stop()
-		mygin.Start(gin, controller.InitCtrlByName)
+		mygin.ReStart(gin, controller.InitCtrlByName)
 
 	default:
 		log.Println("cmd arg is wrong,such as: xxx start/stop/restart")

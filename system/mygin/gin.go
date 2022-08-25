@@ -2,6 +2,7 @@ package mygin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -49,9 +50,37 @@ func Stop() {
 		cmdLog("stop error: cmd exec error,pid:" + old_pid + ",err:" + err.Error())
 	} else {
 		cmdLog("stop success:" + string(out))
-		empty_pid := ""
-		helper.WriteFile(pid_file, &empty_pid)
 	}
+}
+
+func ReStart(gin *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
+	Stop()
+	err := waitStop(3)
+	if err != nil {
+		cmdLog("waitStop error:" + err.Error())
+		cmdLog("try start...")
+	}
+	Start(gin, initCtrlByNameCB)
+}
+
+//等待先前启动的进程停止了再start
+func waitStop(waitSecond int) error {
+	old_pid, err := getOldPid()
+	if err != nil {
+		return errors.New("pid read error " + err.Error() + ",pid file:" + pid_file)
+	}
+	if old_pid == "" {
+		return nil //等待好了
+	}
+	if waitSecond == 0 { //等待超时了
+		return errors.New("timeout")
+	}
+	cmdLog("waitStop ...")
+	if old_pid != "" { //继续等待
+		time.Sleep(time.Second)
+		return waitStop(waitSecond - 1)
+	}
+	return nil
 }
 
 func Start(gin *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
@@ -60,6 +89,7 @@ func Start(gin *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
 
 	port := core.GetConfigString("app.port")
 	r := ginInit(gin, initCtrlByNameCB)
+
 	//r.Run(":" + port)
 	srv := &http.Server{
 		Addr:    ":" + port,
@@ -85,7 +115,7 @@ func listenAndServer(srv *http.Server, port string) {
 	} else {
 		err = srv.ListenAndServe()
 	}
-	
+
 	if err != nil && err != http.ErrServerClosed {
 		cmdLog("start error:" + err.Error())
 		helper.WriteFile(pid_file, &old_pid) //启动失败，写回去
@@ -111,7 +141,7 @@ func getOldPid() (string, error) {
 //graceful  优雅关闭
 func forShutdown(srv *http.Server) {
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGHUP, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM) //ctrl+c=>os.Interrt  kill -9=>os.Kill ,kill xx =>syscall.SIGTERM
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM) //ctrl+c=>os.Interrt  kill -9=>os.Kill ,kill xx =>syscall.SIGTERM
 	got := <-quit
 
 	cmdLog("server shutdown start:" + got.String())
@@ -122,6 +152,8 @@ func forShutdown(srv *http.Server) {
 	} else {
 		cmdLog("server shutdown success,oldpid:" + getPid())
 	}
+	empty_pid := ""
+	helper.WriteFile(pid_file, &empty_pid)
 }
 
 func ginInit(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) *gin.Engine {
