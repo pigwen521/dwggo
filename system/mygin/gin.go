@@ -213,7 +213,7 @@ func getProcessByPid(pid int32) (string, *process.Process, error) {
 //graceful  优雅关闭
 func forShutdown(srv *http.Server) {
 	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM) //退出终端=》syscall.SIGHUP；ctrl+c=>os.Interrt；kill xx =>syscall.SIGTERM,Terminate;；kill -9=>os.Kill syscall.SIGKILL 忽略 无法被接收
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM) //退出终端=》syscall.SIGHUP；ctrl+c=>os.Interrt；kill xx =>syscall.SIGTERM,Terminate;；kill -9=>os.Kill syscall.SIGKILL 忽略 无法被接收
 	got := <-quit
 
 	cmdLog("old server shutdown start:" + got.String())
