@@ -1,14 +1,7 @@
 package str
 
 import (
-	"bytes"
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/md5"
-	"crypto/sha1"
-	"crypto/sha256"
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"regexp"
 	"strconv"
@@ -40,65 +33,11 @@ func FirstToUpper(str string) string {
 	return upperStr
 }
 
-func Md5(str string) string {
-	h := md5.New()
-	h.Write([]byte(str))
-	return hex.EncodeToString(h.Sum(nil))
-}
-func Sha256(str string) string {
-	h := sha256.New()
-	h.Write([]byte(str))
-	return hex.EncodeToString(h.Sum(nil))
-}
-func Sha1(str string) string {
-	h := sha1.New()
-	h.Write([]byte(str))
-	return hex.EncodeToString(h.Sum(nil))
-}
-
-//DES加密 CBS CS5
-func DesEncrypt_CBC_CS5(origData_byte, key_byte []byte) ([]byte, error) {
-	aesBlockEncrypter, err := aes.NewCipher(key_byte)
-	content := pKCS5Padding(origData_byte, aesBlockEncrypter.BlockSize())
-	encrypted := make([]byte, len(content))
-	if err != nil {
-		println(err.Error())
-		return nil, err
-	}
-	aesEncrypter := cipher.NewCBCEncrypter(aesBlockEncrypter, key_byte) //IV
-	aesEncrypter.CryptBlocks(encrypted, content)
-	return encrypted, nil
-}
-
-//DES解密 CBS CS5
-func DesDecrypt_CBC_CS5(encryptData, key_byte []byte) (data []byte, err error) {
-	decrypted := make([]byte, len(encryptData))
-	var aesBlockDecrypter cipher.Block
-	aesBlockDecrypter, err = aes.NewCipher(key_byte)
-	if err != nil {
-		println(err.Error())
-		return nil, err
-	}
-	aesDecrypter := cipher.NewCBCDecrypter(aesBlockDecrypter, key_byte)
-	aesDecrypter.CryptBlocks(decrypted, encryptData)
-	return pKCS5UnPadding(decrypted), nil
-}
-
-func pKCS5Padding(cipherText []byte, blockSize int) []byte {
-	padding := blockSize - len(cipherText)%blockSize
-	padText := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(cipherText, padText...)
-}
-func pKCS5UnPadding(encrypt []byte) []byte {
-	padding := encrypt[len(encrypt)-1]
-	return encrypt[:len(encrypt)-int(padding)]
-}
-
 func EqualStrInterface(str string, ele interface{}) bool {
 	return ToString(ele) == str
 }
 
-//字符串转int
+// 字符串转int
 func ToInt(str string) int {
 	i, _ := strconv.Atoi(str)
 	return i
@@ -107,7 +46,7 @@ func ToIntAny(str interface{}) int {
 	return ToInt(ToString(str))
 }
 
-//字符串转int
+// 字符串转int
 func ToFloat32(str string) float32 {
 	i, _ := strconv.ParseFloat(str, 32)
 	return float32(i)
@@ -116,7 +55,7 @@ func ToFloat32Any(str interface{}) float32 {
 	return ToFloat32(ToString(str))
 }
 
-//将interface{}类型的变量转成字符串
+// 将interface{}类型的变量转成字符串
 // 浮点型 3.0将会转换成字符串3, "3"
 func ToString(value interface{}) string {
 	var key string
@@ -270,11 +209,11 @@ func Base64_decode_byte(bytes []byte) []byte {
 	return dbuf[:n]
 }
 
-//日期时间格式转换
-//TimeFormat(str.TIME_YMD,str.TIME_YMDHIS,"2021-12-01 12:30:30")
-//return 2021-12-01
+// 日期时间格式转换
+// TimeFormat(str.TIME_YMD,str.TIME_YMDHIS,"2021-12-01 12:30:30")
+// return 2021-12-01
 func TimeFormat(out_format, input_format, input_date string) string {
-	t, _ := time.Parse(TIME_YMDHIS, input_date)
+	t, _ := time.Parse(input_format, input_date)
 	return t.Format(out_format)
 }
 func GetAgeByBirthday(birthday string) int {
@@ -293,7 +232,7 @@ func GetAgeByBirthday(birthday string) int {
 	return age
 }
 
-//匹配字符串开头，如果有特殊符号，正则可能出错
+// 匹配字符串开头，如果有特殊符号，正则可能出错
 func StartWithReg(str *string, prefixs []string) bool {
 	reg_str := strings.Join(prefixs, "|")
 	m, err := regexp.MatchString(`^(`+reg_str+`)`, *str)
