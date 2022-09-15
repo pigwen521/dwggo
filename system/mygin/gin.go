@@ -52,7 +52,7 @@ func ReStart(gin *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) {
 	Start(gin, initCtrlByNameCB)
 }
 
-//等待先前启动的进程停止了再start
+// 等待先前启动的进程停止了再start
 func waitStop(old_proc *process.Process, waitSecond int) error {
 	if old_proc == nil {
 		return nil
@@ -210,7 +210,7 @@ func getProcessByPid(pid int32) (string, *process.Process, error) {
 	return now_pName, now_pn, err
 }
 
-//graceful  优雅关闭
+// graceful  优雅关闭
 func forShutdown(srv *http.Server) {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM) //退出终端=》syscall.SIGHUP；ctrl+c=>os.Interrt；kill xx =>syscall.SIGTERM,Terminate;；kill -9=>os.Kill syscall.SIGKILL 忽略 无法被接收
@@ -229,15 +229,15 @@ func forShutdown(srv *http.Server) {
 }
 
 func ginInit(r *gin.Engine, initCtrlByNameCB InitCtrlByNameCB) *gin.Engine {
-
+	//middleWareTimeout(r)	//请求执行超时告警
 	middleWareLimiter(r)           //限流器
 	InitRoute(r, initCtrlByNameCB) //映射路由到控制器
 	MyginEngin = r
 	return r
 }
 
-//判断模板文件是否存在
-//if mygin.IsExistTemplateFile("home/index.html") )
+// 判断模板文件是否存在
+// if mygin.IsExistTemplateFile("home/index.html") )
 func IsExistTemplateFile(tmp_file string) bool {
 	if gin.IsDebugging() {
 		aa := (MyginEngin.HTMLRender).(render.HTMLDebug)
@@ -249,7 +249,7 @@ func IsExistTemplateFile(tmp_file string) bool {
 	}
 }
 
-//限流器中间件
+// 限流器中间件
 func middleWareLimiter(r *gin.Engine) {
 	rate_second := core.GetConfigFloat64("limiter.rate_second")
 	capacity := core.GetConfigInt("limiter.capacity")
@@ -264,6 +264,24 @@ func middleWareLimiter(r *gin.Engine) {
 			core.LogError("当前请求过多，当前限流：" + str.ToString(rate_second) + "次/秒,容量：" + str.ToString(capacity))
 			ctx.Abort()
 		}
+	})
+}
+
+// 请求超时告警
+func middleWareTimeout(r *gin.Engine) {
+	r.Use(func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+		defer cancel()
+		c.Request = c.Request.WithContext(ctx)
+		go func(c *gin.Context) {
+			select {
+			case <-ctx.Done():
+				if ctx.Err() == context.DeadlineExceeded { //超时了
+					core.LogError("请注意，请求执行超时了" + c.Request.RequestURI)
+				}
+			}
+		}(c)
+		c.Next() //执行业务代码
 	})
 }
 func closeAll() {
