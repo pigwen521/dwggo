@@ -17,8 +17,10 @@ const ROLLING_TIME_SESS_KEY = "__rolling_time__"
 
 var ROLLING_INTERVAL_SECOND = time.Second.Nanoseconds() * 60 //刷新间隔时间，默认60(秒)，刚刷过60秒内不再刷
 
-/**
+/*
+*
 用法1：
+
 	session, err := core.InitSession(ctx.Request, ctx.Writer,entity.user{})
 	if err != nil {
 		//err
@@ -35,6 +37,7 @@ var ROLLING_INTERVAL_SECOND = time.Second.Nanoseconds() * 60 //刷新间隔时�
 
 用法2：
 默认一个固定的key,const SESS_USER_KEY = "gin_user"
+
 	//保存
 	err:=core.SaveUserSess(ctx,val,entity.user{})
 	//取值
@@ -76,7 +79,7 @@ type Session struct {
 	isFresh   bool //是否刷新过有效期，一次请求只刷新一次
 }
 
-//初试session-(配置文件的session.name)
+// 初试session-(配置文件的session.name)
 func InitSession(req *http.Request, rpw http.ResponseWriter, reg_vals ...interface{}) (*Session, error) {
 	for _, reg_val := range reg_vals {
 		gob.Register(reg_val)
@@ -89,7 +92,7 @@ func InitSession(req *http.Request, rpw http.ResponseWriter, reg_vals ...interfa
 	return sess, err
 }
 
-//初试session-指定session_name
+// 初试session-指定session_name
 func InitSessionBySessname(req *http.Request, rpw http.ResponseWriter, sess_name string) (*Session, error) {
 	sess := Session{}
 	sess.IsRolling = true
@@ -98,7 +101,7 @@ func InitSessionBySessname(req *http.Request, rpw http.ResponseWriter, sess_name
 	return &sess, err
 }
 
-//获得指定session-指定session_name
+// 获得指定session-指定session_name
 func (self *Session) getSessionBySessname(req *http.Request, rpw http.ResponseWriter, sess_name string) error {
 	if session_name == "" {
 		return errors.New("session未初始化")
@@ -107,13 +110,15 @@ func (self *Session) getSessionBySessname(req *http.Request, rpw http.ResponseWr
 	if err != nil {
 		return err
 	}
+	sess.Options.HttpOnly = true
+	sess.Options.Secure = true
 	self.Sess = sess
 	self.req = req
 	self.rpw = rpw
 	return nil
 }
 
-//清除默认session
+// 清除默认session
 func (self *Session) Del() error {
 	self.Sess.Options.MaxAge = -1
 	err := self.Sess.Save(self.req, self.rpw)
@@ -123,7 +128,7 @@ func (self *Session) Del() error {
 	return err
 }
 
-//获取session内容
+// 获取session内容
 func (self *Session) Get(session_key string) interface{} {
 	if self.IsRolling && !self.isFresh { //获取的时候顺便刷新下过期时间
 		last_roll_time, has := self.Sess.Values[ROLLING_TIME_SESS_KEY]
@@ -137,7 +142,7 @@ func (self *Session) Get(session_key string) interface{} {
 	return self.Sess.Values[session_key]
 }
 
-//保存session
+// 保存session
 func (self *Session) Save(session_key string, session_val interface{}) error {
 	self.Sess.Values[session_key] = session_val
 	err := self.Sess.Save(self.req, self.rpw)
