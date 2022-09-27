@@ -9,19 +9,23 @@ import (
 )
 
 var Redis_pool *redis.Pool
+var redis_key_prefix = ""
 
-/**
+/*
+*
 1,
 myredis := core.MyRedis{}
 defer myredis.Close()
 myredis.Set(key, val, ttl)
 val,err:= redis.String(myredis.Get(key))
-if myredis.IsError(err) {
-	return err happend...
-}
-if val!= ""{
-	//cached
-}
+
+	if myredis.IsError(err) {
+		return err happend...
+	}
+
+	if val!= ""{
+		//cached
+	}
 
 2,
 myredis := core.MyRedis{}
@@ -36,6 +40,8 @@ _, err := conn.Do("Set", "abc", 100, "EX", 100)
 res, err := redis.Int(conn.Do("Get", "abc"))
 */
 func init() {
+	redis_key_prefix = GetConfigString("redis.key_prefix")
+
 	host := GetConfigString("redis.host")
 	port := GetConfigString("redis.port")
 	password := redis.DialPassword(GetConfigString("redis.password"))
@@ -66,8 +72,13 @@ func (self *MyRedis) GetConn() redis.Conn {
 	return self.Conn
 }
 
-//ttl_second 小于等于0，为永久有效
+func (self *MyRedis) getKey(key string) string {
+	return redis_key_prefix + key
+}
+
+// ttl_second 小于等于0，为永久有效
 func (self *MyRedis) Set(key string, val interface{}, ttl_second int) (interface{}, error) {
+	key = self.getKey(key)
 	self.GetConn()
 	if ttl_second <= 0 {
 		return self.Conn.Do("Set", key, val)
@@ -76,15 +87,17 @@ func (self *MyRedis) Set(key string, val interface{}, ttl_second int) (interface
 	}
 }
 func (self *MyRedis) Get(key string) (interface{}, error) {
+	key = self.getKey(key)
 	self.GetConn()
 	return self.Conn.Do("Get", key)
 }
 func (self *MyRedis) Del(key string) (interface{}, error) {
+	key = self.getKey(key)
 	self.GetConn()
 	return self.Conn.Do("Del", key)
 }
 
-//判断Get后的是否有error，要排查为空的数据
+// 判断Get后的是否有error，要排查为空的数据
 func (self *MyRedis) IsError(err error) bool {
 	return err != nil && !errors.Is(err, redis.ErrNil)
 }
